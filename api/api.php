@@ -1,18 +1,52 @@
 <?php
 
+//
+//  Class: Flealy
+//  Flealy API
+//
+//  Created by Daniel Koehler on 08/01/2014.
+//  Copyright (c) 2014 Daniel Koehler. All rights reserved.
+//
+//  Hacky workaround for non use of MVC/Class based architecture.
+//  Uses static memory created for public static properties to store persistent data.
+//
+
+class Flealy {
+
+	public static $user = false;
+	public static $authorisationToken = false;
+
+	function getProperty($name)
+	{
+		return self::$$name;
+	}
+
+	function setProperty($name, $value)
+	{
+		return self::$$name = $value;
+	}
+}
+
+//
+//  api.php
+//  Flealy API
+//  Copyright (c) 2013 Kiran Panesar. All rights reserved.
+//
+
 include 'user.php';
 include 'items.php';
 include 'session.php';
 include 'cart.php';
 include 'rating.php';
 include 'purchase.php';
-
 include 'jsonify.php';
 include 'token_auth_helper.php';
 
 $endpoints = array('items', 'item', 'user', 'session', 'session_token_authentication', 'cart', 'purchase', 'purchases', 'rating');
 
-switch ($_SERVER['REQUEST_METHOD']) {
+$request_method = (isset($_GET['request_method']) ? $_GET['request_method'] : $_SERVER['REQUEST_METHOD']);
+
+switch ($request_method) {
 	case 'GET':
 		if (isset($_GET['action']) && in_array($_GET['action'], $endpoints)) {
 			$_GET = escape_arguments($_GET);

@@ -3,7 +3,7 @@
 function get_user($user_id) {
 	if (!isset($user_id)) {
 		start_session();
-		$user_id = $_SESSION['user'];
+		$user_id = Flealy::getProperty('user');
 	}
 
 	if (isset($user_id)) {
@@ -53,26 +53,30 @@ function create_user($email, $username, $password, $location, $description, $ima
 }
 
 function user_logged_in(){
+
 	if(empty($_GET['authorisation_method']) or $_GET['authorisation_method'] !== 'token'){ // Using session based authorisation.
 		start_session();
-
 		if (!empty($_SESSION['user'])) // Does session exist?
+			Flealy::setProperty('user', $_SESSION['user']);
 			return true;
 	}
 
-	if(!empty($_GET['authorisation_token'])){
-
+	if(!empty($_POST['authorisation_token'])){
 		$db = db_connection(); // Create reuseable connection.
-		$authorisation_token = $_GET['authorisation_token'];
-		$select_query = "SELECT `token`, `last_use` FROM `authorisation_token` WHERE `token` ='$authorisation_token'";
+		$authorisation_token = $_POST['authorisation_token'];
+		$select_query = "SELECT `token`, `last_use`, `user_id` FROM `authorisation_token` WHERE `token` = '$authorisation_token'";
 		$result = $db->query($select_query);
+
 		
 		$remote_address = $_SERVER['REMOTE_ADDR'];
 		$last_use =  time();
 
 		if($result->num_rows){ // Check that token is valid and then insert Current IP address and update use timestamp.
-			$insert_query = "UPDATE `authorisation_token` SET (`last_use` = '$last_use', `remote_address` = '$remote_address') WHERE `authorisation_token` = '$authorisation_token'";
+			$user_id = $result->fetch_assoc()['user_id'];
+			$insert_query = "UPDATE `authorisation_token` SET `last_use` = '$last_use', `remote_address` = '$remote_address' WHERE `user_id` = '$user_id'";
 			if ($db->query($insert_query)){
+				
+				Flealy::setProperty('user',$user_id);
 				return true;
 			}	
 		}

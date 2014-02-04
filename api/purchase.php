@@ -3,7 +3,7 @@
 function purchase_item($item_id, $card_id, $transaction_id) {
 	if (user_logged_in()) {
 		
-		$user_id = $_SESSION['user'];
+		$user_id = Flealy::getProperty('user');
 
 		$purchase_time = time();
 		$insert_query = "INSERT INTO purchases (item_id, buyer_id, card_id, stripe_transaction_id, purchase_epoch) VALUES ('$item_id', '$user_id', '$card_id', '$transaction_id', '$purchase_time')";
@@ -19,7 +19,7 @@ function purchase_item($item_id, $card_id, $transaction_id) {
 
 function get_purchase_history() {
 	if (user_logged_in()) {
-		$user_id = $_SESSION['user'];
+		$user_id = Flealy::getProperty('user');
 		$select_query = "SELECT items.item_id, items.name, items.image_url, items.price, purchases.purchase_epoch FROM purchases INNER JOIN items on items.item_id = purchases.item_id AND purchases.buyer_id = '$user_id' ORDER BY purchases.purchase_epoch DESC";
 		
 		if ($result = db_connection()->query($select_query)) {

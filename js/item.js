@@ -34,6 +34,7 @@ function setItemOverlayEditCallback(callback) {
 function buyItem(item_id) {
 
 	if (getUserData() != null) {
+		console.log(item_json);
 		if (getUserData().user_id != item_json.user_id) {
 			var api_request = new XMLHttpRequest();
 			api_request.open("POST", "../api/api.php", true);

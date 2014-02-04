@@ -55,7 +55,10 @@ function sign_in($username, $password) {
 	// If the login was successful, save
 	if($row = $result->fetch_assoc()){
 		start_session();
+
 		$_SESSION['user'] = $row['user_id'];
+		Flealy::setProperty('user', $row['user_id']);
+		
 		unset($row['password']);
 	    return clean_json_encode($row);
 	}

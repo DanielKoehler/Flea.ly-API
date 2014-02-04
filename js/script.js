@@ -64,7 +64,7 @@ function getUserData() {
 		if (end_index == -1) {
 			end_index = cookie.length;
 		};
-		
+		console.log(JSON.parse(unescape(cookie.substring(start_index, end_index))));
 		return JSON.parse(unescape(cookie.substring(start_index, end_index)));
 	};
 };

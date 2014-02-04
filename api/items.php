@@ -6,7 +6,6 @@
 
 function get_items($lat, $lon, $range, $sorting, $search_term, $user_id) {
 	// get the items
-	start_session();
 	$sql_query = "";
 
 	if (isset($user_id)) {
@@ -15,8 +14,11 @@ function get_items($lat, $lon, $range, $sorting, $search_term, $user_id) {
 		if (!isset($range)) {
 			$range = 1; // Default to 1mile radius
 		}
-		$_SESSION['latitude']  = $lat;
-		$_SESSION['longitude'] = $lon;
+
+		if(empty($_GET['authorisation_method']) or $_GET['authorisation_method'] !== 'token'){ // Using session based authorisation.
+			$_SESSION['latitude']  = $lat;
+			$_SESSION['longitude'] = $lon;
+		}
 
 		// Haversine formula!
 		// Finds the items in the range using maths. (Yeah! Maths!)
@@ -55,9 +57,8 @@ function get_items($lat, $lon, $range, $sorting, $search_term, $user_id) {
 }
 
 function get_item($item_id) {
-	start_session();
 	$select_query = "SELECT * FROM items WHERE item_id='$item_id'";
-	$result = db_connection() -> query($select_query);
+	$result = db_connection()->query($select_query);
 	
 	if (!$result) {
 		http_response_code(404);
@@ -70,10 +71,8 @@ function get_item($item_id) {
 }
 
 function create_item($name, $description, $price, $image_data, $latitude, $longitude) {
-
-	start_session();
 	if (user_logged_in()) {
-		$user_id = $_SESSION['user'];
+		$user_id = Flealy::getProperty('user');
 
 		$filtered_data = substr($image_data, strpos($image_data, ",")+1);
 		$filtered_data = str_replace(" ", "+", $filtered_data);
@@ -99,9 +98,6 @@ function create_item($name, $description, $price, $image_data, $latitude, $longi
 // Only send the values that need changing
 function edit_item($post_array) {
 	unset($post_array['action']);
-
-	start_session();
-	
 	if (user_logged_in()) {
 		
 		if (!isset($post_array['item_id'])) {
@@ -112,7 +108,7 @@ function edit_item($post_array) {
 		$item_id = $post_array['item_id'];
 		$current_item = json_decode(get_item($item_id), true); // This request will die() if item is not found
 	
-		if ($current_item['user_id'] == $_SESSION['user']) {
+		if ($current_item['user_id'] == Flealy::getProperty('user')) {
 			unset($post_array['item_id']); // remove item ID from post array
 
 			$update_query;
@@ -163,10 +159,8 @@ function edit_item($post_array) {
 }
 
 function delete_item($item_id) {
-	start_session();
-
 	if (user_logged_in()) {
-		$user_id = $_SESSION['user'];
+		$user_id = Flealy::getProperty('user');
 		$delete_query = "DELETE FROM items WHERE item_id='$item_id' AND user_id='$user_id'";
 
 		if ($result=db_connection()->query($delete_query)) {

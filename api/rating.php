@@ -4,7 +4,7 @@ function create_rating($item_id, $rating) {
 	start_session();
 
 	if (user_logged_in()) {
-		$user_id = $_SESSION['user'];
+		$user_id = Flealy::getProperty('user');
 
 		$select_query = "SELECT COUNT(*) AS total FROM ratings WHERE item_id = '$item_id' AND rater_id = '$user_id'";
 		

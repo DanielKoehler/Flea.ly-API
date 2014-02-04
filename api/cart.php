@@ -3,9 +3,8 @@
 // Gets the carted items for the current user
 
 function get_cart() {
-	start_session();
 	if (user_logged_in()) {
-		$user_id = $_SESSION['user'];
+		$user_id = Flealy::getProperty('user');
 
 		$select_query = "SELECT items.item_id, items.name, items.image_url, items.price FROM carts INNER JOIN items on items.item_id = carts.item_id AND carts.user_id = '$user_id'";
 
@@ -30,7 +29,7 @@ function get_cart() {
 function checkout_cart($card_id, $transaction_id) {
 	start_session();
 	if (user_logged_in()) {
-		$user_id = $_SESSION['user'];
+		$user_id = Flealy::getProperty('user');
 
 		$select_query = "SELECT items.item_id, items.name, items.image_url, items.price FROM carts INNER JOIN items on items.item_id = carts.item_id AND carts.user_id = '$user_id'";
 
@@ -63,7 +62,7 @@ function add_item_to_cart($item_id) {
 	start_session();
 
 	if (user_logged_in()) {
-		$user_id = $_SESSION['user'];
+		$user_id = Flealy::getProperty('user');
 		$insert_query = "INSERT INTO carts (item_id, user_id) VALUES ('$item_id', '$user_id')";
 
 		if (db_connection()->query($insert_query)) {
@@ -79,7 +78,7 @@ function clear_basket() {
 	start_session();
 
 	if (user_logged_in()) {
-		$user_id = $_SESSION['user'];
+		$user_id = Flealy::getProperty('user');
 		$delete_query = "DELETE FROM carts WHERE user_id = '$user_id'";
 
 		if (db_connection()->query($delete_query)) {
@@ -96,7 +95,7 @@ function remove_item_from_cart($item_id) {
 	start_session();
 
 	if (user_logged_in()) {
-		$user_id = $_SESSION['user'];
+		$user_id = Flealy::getProperty('user');
 		$delete_query = "DELETE FROM carts WHERE user_id = '$user_id' AND item_id = '$item_id'";
 		// echo $delete_query;
 
