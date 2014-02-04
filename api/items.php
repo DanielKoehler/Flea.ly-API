@@ -3,6 +3,7 @@
 // This function is used to return data for the main /browse page
 // as well as the individual user pages.
 // So only pass the user_id if you're loaded data for the user pages.
+
 function get_items($lat, $lon, $range, $sorting, $search_term, $user_id) {
 	// get the items
 	start_session();
@@ -46,10 +47,10 @@ function get_items($lat, $lon, $range, $sorting, $search_term, $user_id) {
 
 		while ($row = $result->fetch_assoc()) {
 			$row['average_rating'] = floor($row['average_rating']*100);
-			$results_array[] = json_encode($row);
+			$results_array[] = $row;
 		}
 
-		return json_encode($results_array);
+		return clean_json_encode($results_array);
 	}
 }
 
@@ -60,18 +61,18 @@ function get_item($item_id) {
 	
 	if (!$result) {
 		http_response_code(404);
-		die(json_encode(array('error' => array('code' => 404, 'message' => 'Item not found'))));
+		die(clean_json_encode(array('error' => array('code' => 404, 'message' => 'Item not found'))));
 	}
 
 	while ($row = $result->fetch_assoc()) {
-		return json_encode($row);
+		return clean_json_encode($row);
 	}
 }
 
 function create_item($name, $description, $price, $image_data, $latitude, $longitude) {
 
 	start_session();
-	if (isset($_SESSION['user'])) {
+	if (user_logged_in()) {
 		$user_id = $_SESSION['user'];
 
 		$filtered_data = substr($image_data, strpos($image_data, ",")+1);
@@ -87,11 +88,11 @@ function create_item($name, $description, $price, $image_data, $latitude, $longi
 		$insert_query = "INSERT INTO items (name, description, price, image_url, latitude, longitude, user_id) VALUES ('$name', '$description', '$price', '$image_url', '$latitude', '$longitude', '$user_id')";
 
 		if ($result = db_connection()->query($insert_query)) {
-			return json_encode(array('code' => 200, 'message' => 'success'));
+			return clean_json_encode(array('code' => 200, 'message' => 'success'));
 		}
 	} else {
 		http_response_code(401);
-		die(json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
+		die(clean_json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
 	}
 }
 
@@ -101,11 +102,11 @@ function edit_item($post_array) {
 
 	start_session();
 	
-	if (isset($_SESSION['user'])) {
+	if (user_logged_in()) {
 		
 		if (!isset($post_array['item_id'])) {
 			http_response_code(404);
-			die(json_encode(array('error' => array('code' => 400, 'message' => 'Item not found'))));
+			die(clean_json_encode(array('error' => array('code' => 400, 'message' => 'Item not found'))));
 		}
 
 		$item_id = $post_array['item_id'];
@@ -145,35 +146,35 @@ function edit_item($post_array) {
 			echo $update_query;
 
 			if ($result=db_connection()->query($update_query)) {
-				return json_encode(array('code' => 200, 'message' => 'success'));
+				return clean_json_encode(array('code' => 200, 'message' => 'success'));
 			} else {
 				http_response_code(500);
-				die(json_encode(array('error' => array('code' => 500, 'message' => 'Couldn\'t update item at this time'))));
+				die(clean_json_encode(array('error' => array('code' => 500, 'message' => 'Couldn\'t update item at this time'))));
 			}
 
 		} else {
 			http_response_code(400);
-			die(json_encode(array('error' => array('code' => 400, 'message' => 'Can\'t edit an item that\'s not yours'))));
+			die(clean_json_encode(array('error' => array('code' => 400, 'message' => 'Can\'t edit an item that\'s not yours'))));
 		}
 	} else {
 		http_response_code(401);
-		die(json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
+		die(clean_json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
 	}
 }
 
 function delete_item($item_id) {
 	start_session();
 
-	if (isset($_SESSION['user'])) {
+	if (user_logged_in()) {
 		$user_id = $_SESSION['user'];
 		$delete_query = "DELETE FROM items WHERE item_id='$item_id' AND user_id='$user_id'";
 
 		if ($result=db_connection()->query($delete_query)) {
-			return json_encode(array('code' => 200, 'message' => 'success'));
+			return clean_json_encode(array('code' => 200, 'message' => 'success'));
 		}
 	} else {
 		http_response_code(401);
-		die(json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
+		die(clean_json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
 	}
 }
 

@@ -10,7 +10,7 @@ window.onload = function() {
 	var user_id = "";
 
 	if (start_index == -1) {
-		user_id = getUserData()['user_id'];
+		user_id = getUserData()['userId'];
 	} else {
 		start_index += 3;
 		var end_index   = window.location.href.indexOf("&", start_index);
@@ -44,7 +44,7 @@ function loadUserInfo(user_id) {
 				return;
 			} else {
 				if (getUserData() != null) {
-					if (getUserData()['user_id'] == JSON.parse(api_request.responseText)['user_id']) {
+					if (getUserData()['userId'] == JSON.parse(api_request.responseText)['userId']) {
 						saveUserData(api_request.responseText);
 					};
 				};				
@@ -84,7 +84,7 @@ function parseItemsJSON(items) {
 		htmlString = "<tr>";
 	
 		for (var i = 0; i < items_json.length; i++) {
-			var item = JSON.parse(items_json[i]);
+			var item = items_json[i];
 
 			if (i % 3 == 0) {
 				htmlString += "</tr>";
@@ -92,7 +92,7 @@ function parseItemsJSON(items) {
 			};
 
 			htmlString += "<td>";
-			htmlString += itemHTML(item['name'], item['image_url'], item['price'], item['average_rating'], item['item_id']);
+			htmlString += itemHTML(item['name'], item['imageUrl'], item['price'], item['averageRating'], item['itemId']);
 			htmlString += "</td>"
 		};
 
@@ -110,7 +110,7 @@ function parseItemsJSON(items) {
 function parseUserData(response_json) {
 	document.title = response_json.username;
 	var user_picture = document.getElementById('user-picture');
-	user_picture.setAttribute("src", response_json['image_url']);
+	user_picture.setAttribute("src", response_json['imageUrl']);
 
 	var username_label = document.getElementById("user-name");
 	username_label.innerHTML = response_json['username'];
@@ -124,8 +124,8 @@ function parseUserData(response_json) {
 
 function showItem(id) {
 	for (var i = 0; i < items_json.length; i++) {
-		var item = JSON.parse(items_json[i]);
-		if (item.item_id == id) {
+		var item = items_json[i];
+		if (item.itemId == id) {
 			showItemDialog(item);
 			setItemOverlayDeleteCallback(function() {
 				loadItems(current_user_id);
@@ -144,6 +144,6 @@ function showItem(id) {
 }
 
 function itemHTML(name, image_url, price, rating, id) {
-	var onclickArgument = "showItem("+id+")"
+	var onclickArgument = "showItem("+id+")";
 	return "<div class='item-table-summary' id='" + id + "' onclick='"+onclickArgument+"';> <a href='#'> <img class='item-image' src='"+image_url+"'/><p class='item-name'>" + name + "</p> <p class='item-price'>&pound;" + price + "</p> <p class='item-rating'>" + rating + "%</p> </a> </div>";
 };

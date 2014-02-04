@@ -92,7 +92,7 @@ function parseItemsJSON(items) {
 		htmlString = "<tr>";
 	
 		for (var i = 0; i < browse_items_json.length; i++) {
-			var item = JSON.parse(browse_items_json[i]);
+			var item = browse_items_json[i];
 
 			if (i % 2 == 0) {
 				htmlString += "</tr>";
@@ -100,7 +100,7 @@ function parseItemsJSON(items) {
 			};
 
 			htmlString += "<td>";
-			htmlString += itemHTML(item['name'], item['image_url'], item['price'], item['average_rating'], item['item_id']);
+			htmlString += itemHTML(item['name'], item['imageUrl'], item['price'], item['averageRating'], item['itemId']);
 			htmlString += "</td>"
 		};
 
@@ -123,10 +123,9 @@ function itemHTML(name, image_url, price, rating, id) {
 };
 
 function showItem(id) {
-
 	for (var i = 0; i < browse_items_json.length; i++) {
-		var item = JSON.parse(browse_items_json[i]);
-		if (item.item_id == id) {
+		var item = browse_items_json[i];
+		if (item.itemId == id) {
 			showItemDialog(item);
 			setItemOverlayDeleteCallback(function() {
 				initializeMap(current_position.coords.latitude, current_position.coords.longitude);
@@ -159,7 +158,7 @@ function initializeMap(lat, lon) {
 function dropPins(position) {
 
 	for (var i = 0; i < browse_items_json.length; i++) {
-		var item = JSON.parse(browse_items_json[i]);
+		var item = browse_items_json[i];
 
 		dropPin(map, item);
 	};
@@ -172,7 +171,7 @@ function dropPin(map, item) {
 	var marker = new google.maps.Marker({			
 	    position: new google.maps.LatLng(item.latitude, item.longitude),
 	    map: map,
-	    title: item['item_id']
+	    title: item['itemId']
 	});
 
 	google.maps.event.addListener(marker, "click", function(e) {

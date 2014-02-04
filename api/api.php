@@ -1,4 +1,5 @@
 <?php
+
 include 'user.php';
 include 'items.php';
 include 'session.php';
@@ -6,7 +7,10 @@ include 'cart.php';
 include 'rating.php';
 include 'purchase.php';
 
-$endpoints = array('items', 'item', 'user', 'session', 'cart', 'purchase', 'purchases', 'rating');
+include 'jsonify.php';
+include 'token_auth_helper.php';
+
+$endpoints = array('items', 'item', 'user', 'session', 'session_token_authentication', 'cart', 'purchase', 'purchases', 'rating');
 
 switch ($_SERVER['REQUEST_METHOD']) {
 	case 'GET':
@@ -42,7 +46,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 					}
 
 					echo get_items($lat, $lon, $range, $sorting, $search_term, $user);
-					break;
+			break;
 				case 'item':
 					# code...
 					break;
@@ -59,7 +63,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
 		} else {
 			http_response_code(404);
-			die(json_encode(array('error' => array('code' => 404, 'message' => 'API endpoint request not found'))));
+			die(clean_json_encode(array('error' => array('code' => 404, 'message' => 'API endpoint request not found'))));
 		}
 		break;
 	case 'POST':	
@@ -72,6 +76,9 @@ switch ($_SERVER['REQUEST_METHOD']) {
 					break;
 				case 'session':
 					echo sign_in($_POST['username'], $_POST['password']);
+					break;
+				case 'session_token_authentication':
+					echo sign_in_requesting_token($_POST['username'], $_POST['password']);
 					break;
 				case 'item':
 					if (isset($_POST['item_id'])) {
@@ -95,7 +102,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 			}
 		} else {
 			http_response_code(404);
-			die(json_encode(array('error' => array('code' => 404, 'message' => 'API endpoint request not found'))));
+			die(clean_json_encode(array('error' => array('code' => 404, 'message' => 'API endpoint request not found'))));
 		}
 		break;
 	case 'DELETE':
@@ -124,12 +131,12 @@ switch ($_SERVER['REQUEST_METHOD']) {
 			}
 		} else {
 			http_response_code(404);
-			die(json_encode(array('error' => array('code' => 404, 'message' => 'API endpoint request not found'))));
+			die(clean_json_encode(array('error' => array('code' => 404, 'message' => 'API endpoint request not found'))));
 		}
 		break;
 	default:
 		http_response_code(400);
-		die(json_encode(array('error' => array('code' => 400, 'message' => 'Unsupported REST method. Supported methods are GET, POST, DELETE'))));
+		die(clean_json_encode(array('error' => array('code' => 400, 'message' => 'Unsupported REST method. Supported methods are GET, POST, DELETE'))));
 		break;
 }
 
@@ -149,20 +156,18 @@ function escape_arguments($arguments) {
 		$esc_arguments[$name] = $mysqli->real_escape_string($value);
 	}
 
-	// echo json_encode($esc_arguments);
-
 	return $esc_arguments;
 }
 
 function db_connection() {
 	// FOR PRODUCTION
-	$connection = new mysqli('ephesus.cs.cf.ac.uk', 'c1212877', "REDACTED", 'c1212877');
+	$connection = new mysqli('localhost', 'root', '', 'flealy');
 
 	// FOR SANDBOX
 	// $connection = new mysqli('localhost', 'root', 'root', 'flealy');	
 	if ($connection->connect_errno) {
 		http_response_code(500);
-		die(json_encode(array('error' => array('code' => 500, 'message' => 'Could not connect to database'))));
+		die(clean_json_encode(array('error' => array('code' => 500, 'message' => 'Could not connect to database'))));
 	}
 
 	return $connection;
@@ -174,7 +179,7 @@ function login_hash($username, $password) {
 
 function image_path($file_name) {
 	// FOR PRODUCTION
-	return "https://project.cs.cf.ac.uk/K.Panesar/lab2/flealy/api/media/".$file_name;
+	return "http://flea.ly/api/media/".$file_name;
 
 	// FOR SANDBOX
 	// return "http://localhost:8888/api/media/".$file_name;

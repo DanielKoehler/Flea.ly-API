@@ -3,7 +3,7 @@
 function create_rating($item_id, $rating) {
 	start_session();
 
-	if (isset($_SESSION['user'])) {
+	if (user_logged_in()) {
 		$user_id = $_SESSION['user'];
 
 		$select_query = "SELECT COUNT(*) AS total FROM ratings WHERE item_id = '$item_id' AND rater_id = '$user_id'";
@@ -17,18 +17,18 @@ function create_rating($item_id, $rating) {
 
 			if ($result = db_connection()->query($insert_query)) {
 				update_average_rating($item_id);
-				return json_encode(array('response'=>'success'));
+				return clean_json_encode(array('response'=>'success'));
 			} else {
 				http_response_code(500);
-				die(json_encode(array('error' => array('code' => 401, 'message' => 'Could not rate item'))));
+				die(clean_json_encode(array('error' => array('code' => 401, 'message' => 'Could not rate item'))));
 			}
 		} else {
 			http_response_code(403);
-			die(json_encode(array('error' => array('code' => 401, 'message' => 'Already rated item'))));
+			die(clean_json_encode(array('error' => array('code' => 401, 'message' => 'Already rated item'))));
 		}
 	} else {
 		http_response_code(401);
-		die(json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
+		die(clean_json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
 	}
 }
 

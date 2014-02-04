@@ -1,5 +1,4 @@
 <!DOCTYPE>
-
 <html>
 <head>
 	<title>Browse Item</title>

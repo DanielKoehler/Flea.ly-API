@@ -118,7 +118,7 @@ function drawItemInfoView(item) {
 	metadata_container.setAttribute("id", "metadata-container")
 
 	var item_image = document.createElement("img");
-	item_image.setAttribute("src", item.image_url);
+	item_image.setAttribute("src", item.imageUrl);
 	item_image.setAttribute("id", "item-detail-image");
 
 	metadata_container.appendChild(item_image);
@@ -134,7 +134,7 @@ function drawItemInfoView(item) {
 	buy_item.setAttribute("class", "btn btn-submit");
 	buy_item.setAttribute("id", "buy-item");
 	buy_item.setAttribute("href", "#");
-	buy_item.setAttribute("onclick", "buyItem(" + item.item_id + ")");
+	buy_item.setAttribute("onclick", "buyItem(" + item.itemId + ")");
 
 	buy_item.innerHTML = "Add to cart (&pound;"+item.price+")";
 	
@@ -143,7 +143,7 @@ function drawItemInfoView(item) {
 	item_detail_description.innerHTML = item.description;
 
 	if (getUserData() != null) {
-		if (item.user_id == getUserData().user_id) {
+		if (item.userId == getUserData().user_id) {
 			var ownership_notification = document.createElement("p");
 			ownership_notification.innerHTML = "This is your item!";
 			ownership_notification.setAttribute("id", "item-ownership-notification");
@@ -152,14 +152,14 @@ function drawItemInfoView(item) {
 			delete_item_button.setAttribute("class", "btn btn-cancel");
 			delete_item_button.setAttribute("id", "delete-item-button");
 			delete_item_button.setAttribute("href", "#");
-			delete_item_button.setAttribute("onclick", "deleteItem(" + item.item_id + ")");
+			delete_item_button.setAttribute("onclick", "deleteItem(" + item.itemId + ")");
 			delete_item_button.innerHTML = "Delete Item";
 
 			var edit_item_button = document.createElement("a");
 			edit_item_button.setAttribute("class", "btn btn-success");
 			edit_item_button.setAttribute("id", "edit-item-button");
 			edit_item_button.setAttribute("href", "#");
-			edit_item_button.setAttribute("onclick", "editItem(" + item.item_id + ")");
+			edit_item_button.setAttribute("onclick", "editItem(" + item.itemId + ")");
 			edit_item_button.innerHTML = "Edit Item";
 
 			button_container.appendChild(edit_item_button);
@@ -169,7 +169,7 @@ function drawItemInfoView(item) {
 			var message_user = document.createElement("a");
 			message_user.setAttribute("class", "btn btn-info");
 			message_user.setAttribute("id", "view-user-profile");
-			message_user.setAttribute("href", "../views/user.php?id="+item['user_id']);
+			message_user.setAttribute("href", "../views/user.php?id="+item['userId']);
 			message_user.innerHTML = "View Seller";
 			
 			button_container.appendChild(buy_item);
@@ -179,7 +179,7 @@ function drawItemInfoView(item) {
 			var message_user = document.createElement("a");
 			message_user.setAttribute("class", "btn btn-info");
 			message_user.setAttribute("id", "view-user-profile");
-			message_user.setAttribute("href", "../views/user.php?id="+item['user_id']);
+			message_user.setAttribute("href", "../views/user.php?id="+item['userId']);
 			message_user.innerHTML = "View Seller";
 			
 			button_container.appendChild(buy_item);

@@ -1,9 +1,10 @@
 <?php
 
 // Gets the carted items for the current user
+
 function get_cart() {
 	start_session();
-	if (isset($_SESSION['user'])) {
+	if (user_logged_in()) {
 		$user_id = $_SESSION['user'];
 
 		$select_query = "SELECT items.item_id, items.name, items.image_url, items.price FROM carts INNER JOIN items on items.item_id = carts.item_id AND carts.user_id = '$user_id'";
@@ -16,19 +17,19 @@ function get_cart() {
 				$results_array[] = $row;
 				$total_cost += $row['price'];
 			}
-			$final_array = array('summary' => array('number_of_items' => count($results_array), 'total_price' => $total_cost), 'items' => json_encode($results_array));
-			return json_encode($final_array);
+			$final_array = array('summary' => array('number_of_items' => count($results_array), 'total_price' => $total_cost), 'items' => clean_json_encode($results_array));
+			return clean_json_encode($final_array);
 		}
 
 	} else {
 		http_response_code(401);
-		die(json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
+		die(clean_json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
 	}
 }
 
 function checkout_cart($card_id, $transaction_id) {
 	start_session();
-	if (isset($_SESSION['user'])) {
+	if (user_logged_in()) {
 		$user_id = $_SESSION['user'];
 
 		$select_query = "SELECT items.item_id, items.name, items.image_url, items.price FROM carts INNER JOIN items on items.item_id = carts.item_id AND carts.user_id = '$user_id'";
@@ -41,7 +42,7 @@ function checkout_cart($card_id, $transaction_id) {
 				$results_array[] = $row;
 				$total_cost += $row['price'];
 			}
-			$final_array = array('summary' => array('number_of_items' => count($results_array), 'total_price' => $total_cost), 'items' => json_encode($results_array));
+			$final_array = array('summary' => array('number_of_items' => count($results_array), 'total_price' => $total_cost), 'items' => clean_json_encode($results_array));
 
 			for ($i=0; $i < $final_array['summary']['number_of_items']; $i++) {
 				$item = json_decode($final_array['items'])[$i];
@@ -49,10 +50,10 @@ function checkout_cart($card_id, $transaction_id) {
 			}
 
 			clear_basket();
-			return json_encode(array('response'=>'success'));
+			return clean_json_encode(array('response'=>'success'));
 		} else {
 			http_response_code(401);
-			die(json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
+			die(clean_json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
 		}
 
 	}
@@ -61,40 +62,40 @@ function checkout_cart($card_id, $transaction_id) {
 function add_item_to_cart($item_id) {
 	start_session();
 
-	if (isset($_SESSION['user'])) {
+	if (user_logged_in()) {
 		$user_id = $_SESSION['user'];
 		$insert_query = "INSERT INTO carts (item_id, user_id) VALUES ('$item_id', '$user_id')";
 
 		if (db_connection()->query($insert_query)) {
-			return json_encode(array('response'=>'success'));
+			return clean_json_encode(array('response'=>'success'));
 		}
 	} else {
 		http_response_code(401);
-		die(json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
+		die(clean_json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
 	}
 }
 
 function clear_basket() {
 	start_session();
 
-	if (isset($_SESSION['user'])) {
+	if (user_logged_in()) {
 		$user_id = $_SESSION['user'];
 		$delete_query = "DELETE FROM carts WHERE user_id = '$user_id'";
 
 		if (db_connection()->query($delete_query)) {
-			return json_encode(array('response'=>'success'));
+			return clean_json_encode(array('response'=>'success'));
 		}
 
 	} else {
 		http_response_code(401);
-		die(json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
+		die(clean_json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
 	}
 }
 
 function remove_item_from_cart($item_id) {
 	start_session();
 
-	if (isset($_SESSION['user'])) {
+	if (user_logged_in()) {
 		$user_id = $_SESSION['user'];
 		$delete_query = "DELETE FROM carts WHERE user_id = '$user_id' AND item_id = '$item_id'";
 		// echo $delete_query;
@@ -105,7 +106,7 @@ function remove_item_from_cart($item_id) {
 
 	} else {
 		http_response_code(401);
-		die(json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
+		die(clean_json_encode(array('error' => array('code' => 401, 'message' => 'You have to be signed in to do that'))));
 	}
 }
 
